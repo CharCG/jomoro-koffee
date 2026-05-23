@@ -16,7 +16,7 @@ import { RolesGuard } from 'src/auth/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
 
 interface AuthenticatedRequest extends Request {
-  user: { userId: number; role: string };
+  user: { id: number; role: string };
 }
 
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -27,17 +27,17 @@ export class CartController {
 
   @Get()
   getCart(@Req() req: AuthenticatedRequest) {
-    return this.cartService.getCart(req.user.userId);
+    return this.cartService.getCart(req.user.id);
   }
 
   @Post('clear')
   clearCart(@Req() req: AuthenticatedRequest) {
-    return this.cartService.clearCart(req.user.userId);
+    return this.cartService.clearCart(req.user.id);
   }
 
   @Post()
   addToCart(@Req() req: AuthenticatedRequest, @Body() dto: AddToCartDto) {
-    return this.cartService.addToCart(req.user.userId, dto);
+    return this.cartService.addToCart(req.user.id, dto);
   }
 
   @Post(':product_id/update')
@@ -46,7 +46,7 @@ export class CartController {
     @Param('product_id', ParseIntPipe) productId: number,
     @Body() dto: UpdateCartItemDto,
   ) {
-    return this.cartService.updateCartItem(req.user.userId, productId, dto.quantity);
+    return this.cartService.updateCartItem(req.user.id, productId, dto.quantity);
   }
 
   @Post(':product_id/delete')
@@ -54,6 +54,6 @@ export class CartController {
     @Req() req: AuthenticatedRequest,
     @Param('product_id', ParseIntPipe) productId: number,
   ) {
-    return this.cartService.removeCartItem(req.user.userId, productId);
+    return this.cartService.removeCartItem(req.user.id, productId);
   }
 }
