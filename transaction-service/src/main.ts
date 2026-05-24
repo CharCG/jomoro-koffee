@@ -13,7 +13,11 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
 
+<<<<<<< HEAD
   const config = new DocumentBuilder().setTitle('Transaction Service').setVersion('0.0').addBearerAuth().build();
+=======
+  const config = new DocumentBuilder().setTitle('Auth Service').setVersion('0.0').addBearerAuth().build();
+>>>>>>> 22237fa (feat(transaction): add orders module with order history and detail endpoints)
   const documentFactory = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory);
 
