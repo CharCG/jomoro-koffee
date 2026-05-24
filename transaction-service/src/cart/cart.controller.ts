@@ -1,59 +1,45 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  ParseIntPipe,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
-import { Request } from 'express';
+import { Controller, Get, Post, Body, Param, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { AddToCartDto, UpdateCartItemDto } from './dto/cart.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { CurrentUserDto } from 'src/common/dto/current-user.dto';
+import { AddToCartDto } from './dto/add-to-cart.dto';
+import { UpdateCartItemDto } from './dto/update-cart.dto';
 
-interface AuthenticatedRequest extends Request {
-  user: { id: number; role: string };
-}
-
+@Controller('cart')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('CUSTOMER')
-@Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @Get()
-  getCart(@Req() req: AuthenticatedRequest) {
-    return this.cartService.getCart(req.user.id);
-  }
-
-  @Post('clear')
-  clearCart(@Req() req: AuthenticatedRequest) {
-    return this.cartService.clearCart(req.user.id);
+  getCart(@CurrentUser() user: CurrentUserDto) {
+    return this.cartService.getCart(user.id);
   }
 
   @Post()
-  addToCart(@Req() req: AuthenticatedRequest, @Body() dto: AddToCartDto) {
-    return this.cartService.addToCart(req.user.id, dto);
+  addToCart(@CurrentUser() user: CurrentUserDto, @Body() dto: AddToCartDto) {
+    return this.cartService.addToCart(user.id, dto);
   }
 
-  @Post(':product_id/update')
+  @Post(':productId/update')
   updateCartItem(
-    @Req() req: AuthenticatedRequest,
-    @Param('product_id', ParseIntPipe) productId: number,
+    @CurrentUser() user: CurrentUserDto,
+    @Param('productId', ParseIntPipe) productId: number,
     @Body() dto: UpdateCartItemDto,
   ) {
-    return this.cartService.updateCartItem(req.user.id, productId, dto.quantity);
+    return this.cartService.updateCartItem(user.id, productId, dto);
   }
 
-  @Post(':product_id/delete')
-  removeCartItem(
-    @Req() req: AuthenticatedRequest,
-    @Param('product_id', ParseIntPipe) productId: number,
-  ) {
-    return this.cartService.removeCartItem(req.user.id, productId);
+  @Post(':productId/delete')
+  deleteCartItem(@CurrentUser() user: CurrentUserDto, @Param('productId', ParseIntPipe) productId: number) {
+    return this.cartService.deleteCartItem(user.id, productId);
+  }
+
+  @Post('clear')
+  clearCart(@CurrentUser() user: CurrentUserDto) {
+    return this.cartService.clearCart(user.id);
   }
 }

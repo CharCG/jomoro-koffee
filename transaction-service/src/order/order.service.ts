@@ -1,16 +1,10 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class OrdersService {
-  private readonly productServiceUrl =
-    process.env.PRODUCT_SERVICE_URL || 'http://localhost:3002';
+export class OrderService {
+  private readonly productServiceUrl = process.env.PRODUCT_SERVICE_URL || 'http://localhost:3002';
 
   constructor(
     private readonly prismaService: PrismaService,
@@ -18,30 +12,19 @@ export class OrdersService {
   ) {}
 
   private generateInternalAdminToken(): string {
-    return this.jwtService.sign(
-      { sub: 0, role: 'ADMIN' },
-      { expiresIn: '1m' },
-    );
+    return this.jwtService.sign({ sub: 0, role: 'ADMIN' }, { expiresIn: '1m' });
   }
 
-  private async reduceProductStock(
-    productId: number,
-    quantity: number,
-  ): Promise<void> {
+  private async reduceProductStock(productId: number, quantity: number): Promise<void> {
     const token = this.generateInternalAdminToken();
 
-    const response = await fetch(
-      `${this.productServiceUrl}/admin/products/${productId}/reduce?quantity=${quantity}`,
-      {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      },
-    );
+    const response = await fetch(`${this.productServiceUrl}/admin/products/${productId}/reduce?quantity=${quantity}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     if (!response.ok) {
-      throw new InternalServerErrorException(
-        `Failed to reduce stock for product ${productId}`,
-      );
+      throw new InternalServerErrorException(`Failed to reduce stock for product ${productId}`);
     }
   }
 
@@ -57,13 +40,9 @@ export class OrdersService {
 
     const productDetails = await Promise.all(
       cart.items.map(async (item) => {
-        const response = await fetch(
-          `${this.productServiceUrl}/products/${item.product_id}`,
-        );
+        const response = await fetch(`${this.productServiceUrl}/products/${item.product_id}`);
         if (!response.ok) {
-          throw new NotFoundException(
-            `Product with id ${item.product_id} not found`,
-          );
+          throw new NotFoundException(`Product with id ${item.product_id} not found`);
         }
         const result = await response.json();
         return result.data ?? result;
@@ -83,11 +62,7 @@ export class OrdersService {
       })),
     });
 
-    await Promise.all(
-      cart.items.map((item) =>
-        this.reduceProductStock(item.product_id, item.quantity),
-      ),
-    );
+    await Promise.all(cart.items.map((item) => this.reduceProductStock(item.product_id, item.quantity)));
 
     await this.prismaService.cartItem.deleteMany({
       where: { cart_id: cart.id },
@@ -124,17 +99,14 @@ export class OrdersService {
         let productName = 'Unknown Product';
 
         try {
-          const response = await fetch(
-            `${this.productServiceUrl}/products/${item.product_id}`,
-          );
+          const response = await fetch(`${this.productServiceUrl}/products/${item.product_id}`);
 
           if (response.ok) {
             const result = await response.json();
             const product = result.data ?? result;
             productName = product?.name ?? 'Unknown Product';
           }
-        } catch {
-        }
+        } catch {}
 
         return {
           product_id: item.product_id,
