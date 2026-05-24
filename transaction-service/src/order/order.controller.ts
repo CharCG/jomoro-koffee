@@ -7,21 +7,17 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CurrentUserDto } from '../common/dto/current-user.dto';
 import { OrdersService } from './order.service';
 
-@ApiTags('Orders')
-@ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('CUSTOMER')
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @ApiOperation({ summary: 'List all orders for the authenticated user' })
   @Get()
   getOrders(@CurrentUser() user: CurrentUserDto) {
     return this.ordersService.getOrders(user.id);
   }
 
-  @ApiOperation({ summary: "Fetch a specific order's product details" })
   @Post(':id')
   getOrderDetail(
     @Param('id', ParseIntPipe) orderId: number,
