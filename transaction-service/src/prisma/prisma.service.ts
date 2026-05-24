@@ -1,9 +1,5 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-<<<<<<< HEAD
 import { PrismaClient } from '../generated/prisma/client';
-=======
-import { PrismaClient } from '@prisma/client/extension';
->>>>>>> 22237fa (feat(transaction): add orders module with order history and detail endpoints)
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 import { ConfigService } from '@nestjs/config';
 
@@ -28,8 +24,4 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   async onModuleDestroy() {
     await this.$disconnect();
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 22237fa (feat(transaction): add orders module with order history and detail endpoints)
