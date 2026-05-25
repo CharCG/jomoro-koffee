@@ -64,7 +64,7 @@ export class CartService {
 
   async addToCart(userId: number, dto: AddToCartDto) {
     const product = await this.fetchProduct(dto.productId);
-
+    
     if (dto.quantity > product.stock) {
       throw new BadRequestException('Quantity exceeds available stock');
     }

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { OrdersController } from './order.controller';
+import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -16,7 +16,7 @@ import { JwtModule } from '@nestjs/jwt';
       }),
     }),
   ],
-  controllers: [OrdersController],
+  controllers: [OrderController],
   providers: [OrderService],
 })
 export class OrderModule {}

@@ -9,7 +9,7 @@ import { CurrentUserDto } from '../common/dto/current-user.dto';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('CUSTOMER')
 @Controller('orders')
-export class OrdersController {
+export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Get()
@@ -17,8 +17,13 @@ export class OrdersController {
     return this.orderService.getOrders(user.id);
   }
 
+  @Post()
+  checkout(@CurrentUser() user: CurrentUserDto) {
+    return this.orderService.checkout(user.id);
+  }
+
   @Post(':id')
-  getOrderDetail(@Param('id', ParseIntPipe) orderId: number, @CurrentUser() user: CurrentUserDto) {
+  getOrderDetail(@CurrentUser() user: CurrentUserDto, @Param('id', ParseIntPipe) orderId: number) {
     return this.orderService.getOrderDetail(orderId, user.id);
   }
 }

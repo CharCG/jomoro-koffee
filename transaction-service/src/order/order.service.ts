@@ -1,30 +1,30 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config/dist/config.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class OrderService {
-  private readonly productServiceUrl = process.env.PRODUCT_SERVICE_URL || 'http://localhost:3002';
-
   constructor(
+    private readonly configService: ConfigService,
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
   ) {}
 
-  private generateInternalAdminToken(): string {
+  private generateAdminToken(): string {
     return this.jwtService.sign({ sub: 0, role: 'ADMIN' }, { expiresIn: '1m' });
   }
 
   private async reduceProductStock(productId: number, quantity: number): Promise<void> {
-    const token = this.generateInternalAdminToken();
+    const token = this.generateAdminToken();
 
-    const response = await fetch(`${this.productServiceUrl}/admin/products/${productId}/reduce?quantity=${quantity}`, {
+    const response = await fetch(`${this.configService.get('PRODUCT_SERVICE_URL')}/admin/products/${productId}/reduce?quantity=${quantity}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     });
 
     if (!response.ok) {
-      throw new InternalServerErrorException(`Failed to reduce stock for product ${productId}`);
+      throw new InternalServerErrorException('Failed to reduce product stock');
     }
   }
 
@@ -35,12 +35,12 @@ export class OrderService {
     });
 
     if (!cart || cart.items.length === 0) {
-      throw new BadRequestException('Your cart is empty.');
+      throw new BadRequestException('Cart is empty');
     }
 
     const productDetails = await Promise.all(
       cart.items.map(async (item) => {
-        const response = await fetch(`${this.productServiceUrl}/products/${item.product_id}`);
+        const response = await fetch(`${this.configService.get('PRODUCT_SERVICE_URL')}/products/${item.product_id}`);
         if (!response.ok) {
           throw new NotFoundException(`Product with id ${item.product_id} not found`);
         }
@@ -68,7 +68,7 @@ export class OrderService {
       where: { cart_id: cart.id },
     });
 
-    return { message: 'Checkout successful. Your order has been placed.' };
+    return { message: 'Order placed successfully' };
   }
 
   async getOrders(userId: number) {
@@ -99,7 +99,7 @@ export class OrderService {
         let productName = 'Unknown Product';
 
         try {
-          const response = await fetch(`${this.productServiceUrl}/products/${item.product_id}`);
+          const response = await fetch(`${this.configService.get('PRODUCT_SERVICE_URL')}/products/${item.product_id}`);
 
           if (response.ok) {
             const result = await response.json();
