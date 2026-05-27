@@ -15,7 +15,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder().setTitle('Transaction Service').setVersion('0.0').addBearerAuth().build();
   const documentFactory = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, documentFactory);
+  SwaggerModule.setup('', app, documentFactory);
 
   await app.listen(process.env.PORT!);
 }
