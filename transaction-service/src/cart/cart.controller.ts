@@ -7,7 +7,13 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CurrentUserDto } from '../common/dto/current-user.dto';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart.dto';
-import { ApiBadRequestResponse, ApiNotFoundResponse, ApiOperation, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 @Controller('cart')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -16,6 +22,7 @@ export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @ApiOperation({ summary: "Get user's cart" })
+  @ApiOkResponse({ description: "The user's cart has been successfully retrieved" })
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @Get()
   getCart(@CurrentUser() user: CurrentUserDto) {
@@ -23,6 +30,7 @@ export class CartController {
   }
 
   @ApiOperation({ summary: "Add an item to user's cart" })
+  @ApiOkResponse({ description: 'The item has been added to the cart successfully' })
   @ApiBadRequestResponse({ description: 'The quantity exceeds available stock or product already exists in the cart' })
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @Post()
@@ -31,6 +39,7 @@ export class CartController {
   }
 
   @ApiOperation({ summary: "Update the quantity of an item in user's cart" })
+  @ApiOkResponse({ description: 'The cart item has been updated successfully' })
   @ApiBadRequestResponse({ description: 'The quantity exceeds available stock' })
   @ApiNotFoundResponse({ description: "The user's cart not found or product not found in the cart" })
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
@@ -44,6 +53,7 @@ export class CartController {
   }
 
   @ApiOperation({ summary: "Delete an item from user's cart" })
+  @ApiOkResponse({ description: 'The cart item has been deleted successfully' })
   @ApiNotFoundResponse({ description: "The user's cart not found or product not found in the cart" })
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @Post(':productId/delete')
@@ -52,6 +62,7 @@ export class CartController {
   }
 
   @ApiOperation({ summary: "Clear user's cart" })
+  @ApiOkResponse({ description: "The user's cart has been cleared successfully" })
   @ApiNotFoundResponse({ description: "The user's cart not found" })
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @Post('clear')

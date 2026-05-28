@@ -16,7 +16,7 @@ export class CartService {
     const response = await fetch(`${productServiceUrl}/products/${productId}`);
 
     if (!response.ok) {
-      throw new NotFoundException(`Product with id ${productId} not found`);
+      throw new NotFoundException(`Product not found`);
     }
 
     return response.json();

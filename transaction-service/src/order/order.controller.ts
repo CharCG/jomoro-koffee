@@ -5,6 +5,12 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CurrentUserDto } from '../common/dto/current-user.dto';
+import {
+  ApiBadRequestResponse,
+  ApiNotAcceptableResponse,
+  ApiOperation,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('CUSTOMER')
@@ -12,13 +18,26 @@ import { CurrentUserDto } from '../common/dto/current-user.dto';
 export class OrdersController {
   constructor(private readonly orderService: OrderService) {}
 
+  @ApiOperation({ summary: '' })
+  @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @Get()
   getOrders(@CurrentUser() user: CurrentUserDto) {
     return this.orderService.getOrders(user.id);
   }
 
-  @Post(':id')
-  getOrderDetail(@Param('id', ParseIntPipe) orderId: number, @CurrentUser() user: CurrentUserDto) {
-    return this.orderService.getOrderDetail(orderId, user.id);
+  @ApiOperation({ summary: '' })
+  @ApiBadRequestResponse({ description: 'The cart not found or is empty' })
+  @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
+  @Post()
+  checkout(@CurrentUser() user: CurrentUserDto) {
+    return this.orderService.checkout(user.id);
+  }
+
+  @ApiOperation({ summary: '' })
+  @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
+  @ApiNotAcceptableResponse({ description: 'The order not found' })
+  @Post(':orderId')
+  getOrderDetail(@Param('orderId', ParseIntPipe) orderId: number, @CurrentUser() user: CurrentUserDto) {
+    return this.orderService.getOrderDetail(orderId);
   }
 }
