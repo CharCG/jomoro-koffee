@@ -20,7 +20,7 @@ export class AuthService {
       throw new BadRequestException('Email already exist');
     }
 
-    const user = await this.prismaService.user.create({
+    const newUser = await this.prismaService.user.create({
       data: {
         first_name: dto.firstName,
         last_name: dto.lastName,
@@ -31,31 +31,31 @@ export class AuthService {
     });
 
     return {
-      userId: user.id,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-      role: user.role,
+      userId: newUser.id,
+      first_name: newUser.first_name,
+      last_name: newUser.last_name,
+      email: newUser.email,
+      role: newUser.role,
     };
   }
 
   async login(dto: LoginDto) {
-    const user = await this.prismaService.user.findUnique({
+    const existingUser = await this.prismaService.user.findUnique({
       where: { email: dto.email },
     });
 
-    if (!user || dto.password !== user.password) {
+    if (!existingUser || dto.password !== existingUser.password) {
       throw new UnauthorizedException('Invalid username or password');
     }
 
-    const accessToken = await this.jwtService.signAsync({ sub: user.id, role: user.role });
+    const accessToken = await this.jwtService.signAsync({ sub: existingUser.id, role: existingUser.role });
 
     return {
-      userId: user.id,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-      role: user.role,
+      userId: existingUser.id,
+      first_name: existingUser.first_name,
+      last_name: existingUser.last_name,
+      email: existingUser.email,
+      role: existingUser.role,
       accessToken,
     };
   }
