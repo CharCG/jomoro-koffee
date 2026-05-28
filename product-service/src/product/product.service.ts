@@ -1,5 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ProductService {
@@ -11,14 +11,10 @@ export class ProductService {
   }
 
   async getProductById(productId: number) {
-    const existingProduct = await this.prismaService.product.findUnique({
+    const product = await this.prismaService.product.findUnique({
       where: { id: productId },
     });
 
-    if (!existingProduct) {
-      throw new NotFoundException('Product not found');
-    }
-
-    return existingProduct;
+    return product;
   }
 }

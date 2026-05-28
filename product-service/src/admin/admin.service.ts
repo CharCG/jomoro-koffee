@@ -1,22 +1,21 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async createProduct(dto: CreateProductDto) {
-    const existingCategory = await this.prismaService.category.findUnique({
+    const category = await this.prisma.category.findUnique({
       where: { id: dto.categoryId },
     });
 
-    if (!existingCategory) {
+    if (!category) {
       throw new NotFoundException('Category not found');
     }
 
-    const newProduct = await this.prismaService.product.create({
+    const product = await this.prisma.product.create({
       data: {
         name: dto.name,
         description: dto.description,
@@ -27,19 +26,19 @@ export class AdminService {
       },
     });
 
-    return newProduct;
+    return product;
   }
 
-  async updateProduct(productId: number, dto: UpdateProductDto) {
-    const existingProduct = await this.prismaService.product.findUnique({
-      where: { id: productId },
+  async updateProduct(productId: number, dto: CreateProductDto) {
+    const category = await this.prisma.category.findUnique({
+      where: { id: dto.categoryId },
     });
 
-    if (!existingProduct) {
-      throw new NotFoundException('Product not found');
+    if (!category) {
+      throw new NotFoundException('Category not found');
     }
 
-    const updatedProduct = await this.prismaService.product.update({
+    const product = await this.prisma.product.update({
       where: { id: productId },
       data: {
         name: dto.name,
@@ -47,47 +46,45 @@ export class AdminService {
         price: dto.price,
         stock: dto.stock,
         image_url: dto.imageUrl,
-        category: dto.categoryId ? { connect: { id: dto.categoryId } } : undefined,
+        category: { connect: { id: dto.categoryId } },
       },
     });
 
-    return updatedProduct;
+    return product;
   }
 
   async reduceProductStock(productId: number, quantity: number) {
-    const existingProduct = await this.prismaService.product.findUnique({
+    const product = await this.prisma.product.findUnique({
       where: { id: productId },
     });
 
-    if (!existingProduct) {
+    if (!product) {
       throw new NotFoundException('Product not found');
     }
 
-    if (existingProduct.stock < quantity) {
+    if (product.stock < quantity) {
       throw new BadRequestException('Insufficient stock');
     }
 
-    const updatedProduct = await this.prismaService.product.update({
+    const updatedProduct = await this.prisma.product.update({
       where: { id: productId },
-      data: { stock: existingProduct.stock - quantity },
+      data: { stock: product.stock - quantity },
     });
 
     return updatedProduct;
   }
 
   async deleteProduct(productId: number) {
-    const existingProduct = await this.prismaService.product.findUnique({
+    const product = await this.prisma.product.findUnique({
       where: { id: productId },
     });
 
-    if (!existingProduct) {
+    if (!product) {
       throw new NotFoundException('Product not found');
     }
 
-    const deletedProduct = await this.prismaService.product.delete({
+    return await this.prisma.product.delete({
       where: { id: productId },
     });
-
-    return deletedProduct;
   }
 }

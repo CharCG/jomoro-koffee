@@ -13,7 +13,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
 
-  const config = new DocumentBuilder().setTitle('Product Service').setVersion('0.0').addBearerAuth().build();
+  const config = new DocumentBuilder().setTitle('Auth Service').setVersion('0.0').addBearerAuth().build();
   const documentFactory = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('', app, documentFactory);
 

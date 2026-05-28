@@ -1,5 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class CategoryService {
@@ -11,16 +11,8 @@ export class CategoryService {
   }
 
   async getProductsByCategoryId(categoryId: number) {
-    const existingCategory = await this.prismaService.category.findUnique({
-      where: { id: categoryId },
-    });
-
-    if (!existingCategory) {
-      throw new NotFoundException('Category not found');
-    }
-
     const products = await this.prismaService.product.findMany({
-      where: { category_id: categoryId },
+      where: { id: categoryId },
     });
 
     return products;
