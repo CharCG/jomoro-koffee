@@ -7,15 +7,15 @@ export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createProduct(dto: CreateProductDto) {
-    const category = await this.prisma.category.findUnique({
+    const existingCategory = await this.prisma.category.findUnique({
       where: { id: dto.categoryId },
     });
 
-    if (!category) {
+    if (!existingCategory) {
       throw new NotFoundException('Category not found');
     }
 
-    const product = await this.prisma.product.create({
+    const newProduct = await this.prisma.product.create({
       data: {
         name: dto.name,
         description: dto.description,
@@ -26,19 +26,27 @@ export class AdminService {
       },
     });
 
-    return product;
+    return newProduct;
   }
 
   async updateProduct(productId: number, dto: CreateProductDto) {
-    const category = await this.prisma.category.findUnique({
+    const existingProduct = await this.prisma.product.findUnique({
+      where: { id: productId },
+    });
+
+    if (!existingProduct) {
+      throw new NotFoundException('Product not found');
+    }
+
+    const existingCategory = await this.prisma.category.findUnique({
       where: { id: dto.categoryId },
     });
 
-    if (!category) {
+    if (!existingCategory) {
       throw new NotFoundException('Category not found');
     }
 
-    const product = await this.prisma.product.update({
+    const updatedProduct = await this.prisma.product.update({
       where: { id: productId },
       data: {
         name: dto.name,
@@ -50,41 +58,43 @@ export class AdminService {
       },
     });
 
-    return product;
+    return updatedProduct;
   }
 
   async reduceProductStock(productId: number, quantity: number) {
-    const product = await this.prisma.product.findUnique({
+    const existingProduct = await this.prisma.product.findUnique({
       where: { id: productId },
     });
 
-    if (!product) {
+    if (!existingProduct) {
       throw new NotFoundException('Product not found');
     }
 
-    if (product.stock < quantity) {
+    if (existingProduct.stock < quantity) {
       throw new BadRequestException('Insufficient stock');
     }
 
     const updatedProduct = await this.prisma.product.update({
       where: { id: productId },
-      data: { stock: product.stock - quantity },
+      data: { stock: existingProduct.stock - quantity },
     });
 
     return updatedProduct;
   }
 
   async deleteProduct(productId: number) {
-    const product = await this.prisma.product.findUnique({
+    const existingProduct = await this.prisma.product.findUnique({
       where: { id: productId },
     });
 
-    if (!product) {
+    if (!existingProduct) {
       throw new NotFoundException('Product not found');
     }
 
-    return await this.prisma.product.delete({
+    const deletedProduct = await this.prisma.product.delete({
       where: { id: productId },
     });
+
+    return deletedProduct;
   }
 }

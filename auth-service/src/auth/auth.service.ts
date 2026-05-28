@@ -44,12 +44,8 @@ export class AuthService {
       where: { email: dto.email },
     });
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    if (dto.password !== user.password) {
-      throw new UnauthorizedException('Invalid credentials');
+    if (!user || dto.password !== user.password) {
+      throw new UnauthorizedException('Invalid username or password');
     }
 
     const accessToken = await this.jwtService.signAsync({ sub: user.id, role: user.role });
