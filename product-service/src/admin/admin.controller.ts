@@ -20,7 +20,7 @@ export class AdminController {
 
   @ApiOperation({ summary: 'Create a new product' })
   @ApiOkResponse({ description: 'The product has been created successfully' })
-  @ApiNotFoundResponse({ description: 'The categoryId not found' })
+  @ApiNotFoundResponse({ description: 'The category ID not found' })
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @Post('products')
   createProduct(@Body() dto: CreateProductDto) {
