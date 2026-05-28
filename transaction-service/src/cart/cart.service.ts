@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config/dist/config.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart.dto';
 
@@ -106,10 +106,6 @@ export class CartService {
 
     if (!cartItem) {
       throw new NotFoundException('Product not found in cart');
-    }
-
-    if (dto.quantity > product.stock) {
-      throw new BadRequestException('Quantity exceeds available stock');
     }
 
     await this.prismaService.cartItem.update({
