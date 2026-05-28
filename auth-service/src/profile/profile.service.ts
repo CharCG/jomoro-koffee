@@ -6,7 +6,7 @@ export class ProfileService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async getProfile(userId: number) {
-    const user = await this.prismaService.user.findUnique({
+    const existingUser = await this.prismaService.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -17,10 +17,10 @@ export class ProfileService {
       },
     });
 
-    if (!user) {
+    if (!existingUser) {
       throw new NotFoundException('User not found');
     }
 
-    return user;
+    return existingUser;
   }
 }

@@ -3,7 +3,13 @@ import { ProfileService } from './profile.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CurrentUserDto } from '../common/dto/current-user.dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 @ApiBearerAuth()
 @Controller('profiles')
@@ -12,9 +18,9 @@ export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @ApiOperation({ summary: 'Get user profile' })
-  @ApiResponse({ status: 200, description: 'User profile retrieved' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'User profile not found' })
+  @ApiOkResponse({ description: 'The user profile has been retrieved successfully' })
+  @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
+  @ApiNotFoundResponse({ description: 'The user profile not found' })
   @Get()
   getProfile(@CurrentUser() user: CurrentUserDto) {
     return this.profileService.getProfile(user.id);

@@ -1,31 +1,31 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min, MinLength } from 'class-validator';
+import { IsNumber, IsOptional, IsString, Max, Min, MinLength } from 'class-validator';
 
-export class CreateProductDto {
+export class UpdateProductDto {
   @ApiProperty({ example: 'Example Product', description: 'The name of the product' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MinLength(3)
-  name!: string;
+  name?: string;
 
   @ApiProperty({ example: 'Example Product Description', description: 'The description of the product' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MinLength(20)
-  description!: string;
+  description?: string;
 
   @ApiProperty({ example: 67.67, description: 'The price of the product' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   @Min(1)
-  price!: number;
+  price?: number;
 
   @ApiProperty({ example: 67, description: 'The stock of the product' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(999)
-  stock!: number;
+  stock?: number;
 
   @ApiProperty({
     example: 'https://jomoro.com/example-product.jpg',
@@ -34,10 +34,10 @@ export class CreateProductDto {
   })
   @IsOptional()
   @IsString()
-  imageUrl!: string;
+  imageUrl?: string;
 
   @ApiProperty({ example: 67, description: 'The category ID of the product' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
-  categoryId!: number;
+  categoryId?: number;
 }
