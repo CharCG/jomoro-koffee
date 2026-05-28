@@ -8,7 +8,8 @@ import { CurrentUserDto } from '../common/dto/current-user.dto';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
-  ApiNotAcceptableResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -20,24 +21,27 @@ import {
 export class OrdersController {
   constructor(private readonly orderService: OrderService) {}
 
-  @ApiOperation({ summary: '' })
+  @ApiOperation({ summary: "Get all user's orders" })
+  @ApiOkResponse({ description: "The user's orders have been successfully retrieved" })
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @Get()
   getOrders(@CurrentUser() user: CurrentUserDto) {
     return this.orderService.getOrders(user.id);
   }
 
-  @ApiOperation({ summary: '' })
-  @ApiBadRequestResponse({ description: 'The cart not found or is empty' })
+  @ApiOperation({ summary: "Checkout the user's cart and create an order" })
+  @ApiOkResponse({ description: 'The order has been created successfully' })
+  @ApiBadRequestResponse({ description: 'The cart not found or is empty or quantity exceeds available stock' })
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @Post()
   checkout(@CurrentUser() user: CurrentUserDto) {
     return this.orderService.checkout(user.id);
   }
 
-  @ApiOperation({ summary: '' })
+  @ApiOperation({ summary: "Get order's details by ID" })
+  @ApiOkResponse({ description: 'The order details have been successfully retrieved' })
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
-  @ApiNotAcceptableResponse({ description: 'The order not found' })
+  @ApiNotFoundResponse({ description: 'The order not found' })
   @Post(':orderId')
   getOrderDetail(@Param('orderId', ParseIntPipe) orderId: number, @CurrentUser() user: CurrentUserDto) {
     return this.orderService.getOrderDetail(orderId);
