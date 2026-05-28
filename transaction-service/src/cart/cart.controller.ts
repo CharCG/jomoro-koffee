@@ -9,12 +9,14 @@ import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart.dto';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('cart')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('CUSTOMER')

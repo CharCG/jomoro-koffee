@@ -7,11 +7,13 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CurrentUserDto } from '../common/dto/current-user.dto';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiNotAcceptableResponse,
   ApiOperation,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('CUSTOMER')
 @Controller('orders')

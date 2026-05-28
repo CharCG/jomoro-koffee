@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class AdminService {
@@ -29,21 +30,13 @@ export class AdminService {
     return newProduct;
   }
 
-  async updateProduct(productId: number, dto: CreateProductDto) {
+  async updateProduct(productId: number, dto: UpdateProductDto) {
     const existingProduct = await this.prismaService.product.findUnique({
       where: { id: productId },
     });
 
     if (!existingProduct) {
       throw new NotFoundException('Product not found');
-    }
-
-    const existingCategory = await this.prismaService.category.findUnique({
-      where: { id: dto.categoryId },
-    });
-
-    if (!existingCategory) {
-      throw new NotFoundException('Category not found');
     }
 
     const updatedProduct = await this.prismaService.product.update({
@@ -54,7 +47,7 @@ export class AdminService {
         price: dto.price,
         stock: dto.stock,
         image_url: dto.imageUrl,
-        category: { connect: { id: dto.categoryId } },
+        category: dto.categoryId ? { connect: { id: dto.categoryId } } : undefined,
       },
     });
 

@@ -67,6 +67,12 @@ export class OrderService {
       }),
     );
 
+    for (let i = 0; i < existingCart.items.length; i++) {
+      if (existingCart.items[i].quantity > productDetails[i].stock) {
+        throw new BadRequestException('Quantity exceeds available stock');
+      }
+    }
+
     const order = await this.prismaService.order.create({
       data: { user_id: userId },
     });
