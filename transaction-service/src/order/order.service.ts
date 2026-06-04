@@ -1,22 +1,20 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config/dist/config.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class OrderService {
   constructor(
-    private readonly configService: ConfigService,
-    private readonly prismaService: PrismaService,
-    private readonly jwtService: JwtService,
+    private readonly _prismaService: PrismaService,
+    private readonly _jwtService: JwtService,
   ) {}
 
   private get productServiceUrl() {
-    return this.configService.get('PRODUCT_SERVICE_URL');
+    return process.env.PRODUCT_SERVICE_URL;
   }
 
   private generateAdminToken(): string {
-    return this.jwtService.sign({ sub: 0, role: 'ADMIN' }, { expiresIn: '1m' });
+    return this._jwtService.sign({ id: 0, role: 'ADMIN' }, { expiresIn: '1m' });
   }
 
   private async fetchProduct(productId: number) {
@@ -43,7 +41,7 @@ export class OrderService {
   }
 
   async getOrders(userId: number) {
-    const orders = await this.prismaService.order.findMany({
+    const orders = await this._prismaService.order.findMany({
       where: { user_id: userId },
       orderBy: { created_at: 'desc' },
     });
@@ -52,7 +50,7 @@ export class OrderService {
   }
 
   async checkout(userId: number) {
-    const existingCart = await this.prismaService.cart.findUnique({
+    const existingCart = await this._prismaService.cart.findUnique({
       where: { user_id: userId },
       include: { items: true },
     });
@@ -73,11 +71,11 @@ export class OrderService {
       }
     }
 
-    const order = await this.prismaService.order.create({
+    const order = await this._prismaService.order.create({
       data: { user_id: userId },
     });
 
-    await this.prismaService.orderDetail.createMany({
+    await this._prismaService.orderDetail.createMany({
       data: existingCart.items.map((item, index) => ({
         order_id: order.id,
         product_id: item.product_id,
@@ -90,7 +88,7 @@ export class OrderService {
       await this.reduceProductStock(item.product_id, item.quantity);
     }
 
-    await this.prismaService.cartItem.deleteMany({
+    await this._prismaService.cartItem.deleteMany({
       where: { cart_id: existingCart.id },
     });
 
@@ -98,7 +96,7 @@ export class OrderService {
   }
 
   async getOrderDetail(orderId: number) {
-    const order = await this.prismaService.order.findUnique({
+    const order = await this._prismaService.order.findUnique({
       where: { id: orderId },
       include: { details: true },
     });

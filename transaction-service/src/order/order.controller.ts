@@ -19,14 +19,14 @@ import {
 @Roles('CUSTOMER')
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(private readonly _orderService: OrderService) {}
 
   @ApiOperation({ summary: "Get all user's orders" })
   @ApiOkResponse({ description: "The user's orders have been successfully retrieved" })
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @Get()
   getOrders(@CurrentUser() user: CurrentUserDto) {
-    return this.orderService.getOrders(user.id);
+    return this._orderService.getOrders(user.id);
   }
 
   @ApiOperation({ summary: "Checkout the user's cart and create an order" })
@@ -35,7 +35,7 @@ export class OrdersController {
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @Post()
   checkout(@CurrentUser() user: CurrentUserDto) {
-    return this.orderService.checkout(user.id);
+    return this._orderService.checkout(user.id);
   }
 
   @ApiOperation({ summary: "Get order's details by ID" })
@@ -44,6 +44,6 @@ export class OrdersController {
   @ApiNotFoundResponse({ description: 'The order not found' })
   @Post(':orderId')
   getOrderDetail(@Param('orderId', ParseIntPipe) orderId: number, @CurrentUser() user: CurrentUserDto) {
-    return this.orderService.getOrderDetail(orderId);
+    return this._orderService.getOrderDetail(orderId);
   }
 }

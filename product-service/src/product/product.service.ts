@@ -3,15 +3,15 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly _prismaService: PrismaService) {}
 
   async getProducts() {
-    const products = await this.prismaService.product.findMany();
+    const products = await this._prismaService.product.findMany();
     return products;
   }
 
   async getProductById(productId: number) {
-    const existingProduct = await this.prismaService.product.findUnique({
+    const existingProduct = await this._prismaService.product.findUnique({
       where: { id: productId },
     });
 

@@ -4,13 +4,13 @@ import { ApiNotFoundResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagge
 
 @Controller('categories')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(private readonly _categoryService: CategoryService) {}
 
   @ApiOperation({ summary: 'Get all categories' })
   @ApiOkResponse({ description: 'The categories have been retrieved successfully' })
   @Get()
   getCategories() {
-    return this.categoryService.getCategories();
+    return this._categoryService.getCategories();
   }
 
   @ApiOperation({ summary: 'Get products by category ID' })
@@ -18,6 +18,6 @@ export class CategoryController {
   @ApiNotFoundResponse({ description: 'The category ID not found' })
   @Get(':categoryId/products')
   getProductsByCategoryId(@Param('categoryId', ParseIntPipe) categoryId: number) {
-    return this.categoryService.getProductsByCategoryId(categoryId);
+    return this._categoryService.getProductsByCategoryId(categoryId);
   }
 }

@@ -7,11 +7,11 @@ import { LoginDto } from './dto/login.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly prismaService: PrismaService,
-    private readonly jwtService: JwtService,
+    private readonly _prismaService: PrismaService,
+    private readonly _jwtService: JwtService,
   ) {}
 
-  validateRegisterInput(dto: RegisterDto) {
+  validateRegisterDto(dto: RegisterDto) {
     for (let i = 0; i < dto.firstName.length; i++) {
       const charCode = dto.firstName.toLowerCase().charCodeAt(i);
       if (charCode < 97 || charCode > 122) {
@@ -27,7 +27,13 @@ export class AuthService {
     }
 
     const emailLower = dto.email.toLowerCase();
-    if (!emailLower.endsWith('.com') && !emailLower.endsWith('.net') && !emailLower.endsWith('.org') && !emailLower.endsWith('.id')) {
+
+    if (
+      !emailLower.endsWith('.com') &&
+      !emailLower.endsWith('.net') &&
+      !emailLower.endsWith('.org') &&
+      !emailLower.endsWith('.id')
+    ) {
       throw new BadRequestException('Email must end with a valid domain (.com, .net, .org, or .id)');
     }
 
@@ -40,21 +46,23 @@ export class AuthService {
     }
 
     let digitCount = 0;
+
     for (let i = 0; i < dto.password.length; i++) {
       const charCode = dto.password.charCodeAt(i);
       if (charCode >= 48 && charCode <= 57) {
         digitCount++;
       }
     }
+
     if (digitCount < 2) {
       throw new BadRequestException('Password must contain at least 2 numbers');
     }
   }
 
   async register(dto: RegisterDto) {
-    this.validateRegisterInput(dto);
+    this.validateRegisterDto(dto);
 
-    const existingUser = await this.prismaService.user.findUnique({
+    const existingUser = await this._prismaService.user.findUnique({
       where: { email: dto.email },
     });
 
@@ -62,7 +70,7 @@ export class AuthService {
       throw new BadRequestException('Email already exists');
     }
 
-    const newUser = await this.prismaService.user.create({
+    const newUser = await this._prismaService.user.create({
       data: {
         first_name: dto.firstName,
         last_name: dto.lastName,
@@ -82,7 +90,7 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const existingUser = await this.prismaService.user.findUnique({
+    const existingUser = await this._prismaService.user.findUnique({
       where: { email: dto.email },
     });
 
@@ -90,7 +98,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid username or password');
     }
 
-    const accessToken = await this.jwtService.signAsync({ sub: existingUser.id, role: existingUser.role });
+    const accessToken = await this._jwtService.sign({ id: existingUser.id, role: existingUser.role });
 
     return {
       userId: existingUser.id,

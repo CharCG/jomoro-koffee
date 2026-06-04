@@ -19,7 +19,7 @@ import {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('ADMIN')
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(private readonly _adminService: AdminService) {}
 
   @ApiOperation({ summary: 'Create a new product' })
   @ApiOkResponse({ description: 'The product has been created successfully' })
@@ -27,7 +27,7 @@ export class AdminController {
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @Post('products')
   createProduct(@Body() dto: CreateProductDto) {
-    return this.adminService.createProduct(dto);
+    return this._adminService.createProduct(dto);
   }
 
   @ApiOperation({ summary: 'Update an existing product details' })
@@ -36,7 +36,7 @@ export class AdminController {
   @ApiNotFoundResponse({ description: 'The category or product not found' })
   @Post('products/:productId/update')
   updateProduct(@Param('productId', ParseIntPipe) productId: number, @Body() dto: UpdateProductDto) {
-    return this.adminService.updateProduct(productId, dto);
+    return this._adminService.updateProduct(productId, dto);
   }
 
   @ApiOperation({ summary: "Reduce a product's stock quantity" })
@@ -49,7 +49,7 @@ export class AdminController {
     @Param('productId', ParseIntPipe) productId: number,
     @Query('quantity', ParseIntPipe) quantity: number,
   ) {
-    return this.adminService.reduceProductStock(productId, quantity);
+    return this._adminService.reduceProductStock(productId, quantity);
   }
 
   @ApiOperation({ summary: 'Delete a product' })
@@ -58,6 +58,6 @@ export class AdminController {
   @ApiNotFoundResponse({ description: 'The category or product not found' })
   @Post('products/:productId/delete')
   deleteProduct(@Param('productId', ParseIntPipe) productId: number) {
-    return this.adminService.deleteProduct(productId);
+    return this._adminService.deleteProduct(productId);
   }
 }

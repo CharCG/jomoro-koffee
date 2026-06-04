@@ -3,15 +3,15 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly _prismaService: PrismaService) {}
 
   async getCategories() {
-    const categories = await this.prismaService.category.findMany();
+    const categories = await this._prismaService.category.findMany();
     return categories;
   }
 
   async getProductsByCategoryId(categoryId: number) {
-    const existingCategory = await this.prismaService.category.findUnique({
+    const existingCategory = await this._prismaService.category.findUnique({
       where: { id: categoryId },
     });
 
@@ -19,7 +19,7 @@ export class CategoryService {
       throw new NotFoundException('Category not found');
     }
 
-    const products = await this.prismaService.product.findMany({
+    const products = await this._prismaService.product.findMany({
       where: { category_id: categoryId },
     });
 

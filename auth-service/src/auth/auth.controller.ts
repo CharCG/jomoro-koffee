@@ -6,14 +6,14 @@ import { ApiBadRequestResponse, ApiOkResponse, ApiOperation, ApiUnauthorizedResp
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly _authService: AuthService) {}
 
   @ApiOperation({ summary: 'Register a new user' })
   @ApiOkResponse({ description: 'The user has been registered successfully' })
   @ApiBadRequestResponse({ description: 'The email already exists' })
   @Post('register')
   async register(@Body() dto: RegisterDto) {
-    return this.authService.register(dto);
+    return this._authService.register(dto);
   }
 
   @ApiOperation({ summary: 'Login a user' })
@@ -22,6 +22,6 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @Post('login')
   async login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
+    return this._authService.login(dto);
   }
 }
