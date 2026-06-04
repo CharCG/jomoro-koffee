@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 
@@ -7,14 +7,14 @@ export class OrderService {
   constructor(
     private readonly _prismaService: PrismaService,
     private readonly _jwtService: JwtService,
-  ) {}
+  ) { }
 
   private get productServiceUrl() {
     return process.env.PRODUCT_SERVICE_URL;
   }
 
   private generateAdminToken(): string {
-    return this._jwtService.sign({ id: 0, role: 'ADMIN' }, { expiresIn: '1m' });
+    return this._jwtService.sign({ sub: 0, role: 'ADMIN' }, { expiresIn: '1m' });
   }
 
   private async fetchProduct(productId: number) {
@@ -24,8 +24,8 @@ export class OrderService {
       throw new NotFoundException(`Product not found`);
     }
 
-    const result = await response.json();
-    return result.data ?? result;
+    const data = await response.json();
+    return data.data;
   }
 
   private async reduceProductStock(productId: number, quantity: number) {
@@ -95,7 +95,7 @@ export class OrderService {
     return { message: 'Order placed successfully' };
   }
 
-  async getOrderDetail(orderId: number) {
+  async getOrderDetail(userId: number, orderId: number) {
     const order = await this._prismaService.order.findUnique({
       where: { id: orderId },
       include: { details: true },
@@ -103,6 +103,10 @@ export class OrderService {
 
     if (!order) {
       throw new NotFoundException('Order not found');
+    }
+
+    if (order.user_id !== userId) {
+      throw new ForbiddenException('Access denied')
     }
 
     const detailedItems = await Promise.all(

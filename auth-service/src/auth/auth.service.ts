@@ -98,7 +98,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid username or password');
     }
 
-    const accessToken = await this._jwtService.sign({ id: existingUser.id, role: existingUser.role });
+    const accessToken = this._jwtService.sign({ sub: existingUser.id, role: existingUser.role });
 
     return {
       userId: existingUser.id,

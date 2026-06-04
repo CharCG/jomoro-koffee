@@ -15,7 +15,8 @@ export class CartService {
       throw new NotFoundException(`Product not found`);
     }
 
-    return response.json();
+    const data = await response.json();
+    return data.data;
   }
 
   private async getOrCreateCart(userId: number) {

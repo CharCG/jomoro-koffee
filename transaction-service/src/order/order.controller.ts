@@ -43,7 +43,7 @@ export class OrdersController {
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @ApiNotFoundResponse({ description: 'The order not found' })
   @Post(':orderId')
-  getOrderDetail(@Param('orderId', ParseIntPipe) orderId: number, @CurrentUser() user: CurrentUserDto) {
-    return this._orderService.getOrderDetail(orderId);
+  getOrderDetail(@CurrentUser() user: CurrentUserDto, @Param('orderId', ParseIntPipe) orderId: number) {
+    return this._orderService.getOrderDetail(user.id, orderId);
   }
 }

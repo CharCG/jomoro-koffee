@@ -15,7 +15,7 @@ import {
 @Controller('profiles')
 @UseGuards(JwtAuthGuard)
 export class ProfileController {
-  constructor(private readonly profileService: ProfileService) {}
+  constructor(private readonly _profileService: ProfileService) {}
 
   @ApiOperation({ summary: 'Get user profile' })
   @ApiOkResponse({ description: 'The user profile has been retrieved successfully' })
@@ -23,6 +23,6 @@ export class ProfileController {
   @ApiNotFoundResponse({ description: 'The user profile not found' })
   @Get()
   getProfile(@CurrentUser() user: CurrentUserDto) {
-    return this.profileService.getProfile(user.id);
+    return this._profileService.getProfile(user.id);
   }
 }
