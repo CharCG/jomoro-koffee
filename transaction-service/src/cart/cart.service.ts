@@ -1,34 +1,31 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config/dist/config.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart.dto';
 
 @Injectable()
 export class CartService {
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly _prismaService: PrismaService) { }
 
   private async fetchProduct(productId: number) {
-    const productServiceUrl = this.configService.get('PRODUCT_SERVICE_URL');
+    const productServiceUrl = process.env.PRODUCT_SERVICE_URL;
     const response = await fetch(`${productServiceUrl}/products/${productId}`);
 
     if (!response.ok) {
       throw new NotFoundException(`Product not found`);
     }
 
-    return response.json();
+    const data = await response.json();
+    return data.data;
   }
 
   private async getOrCreateCart(userId: number) {
-    let cart = await this.prismaService.cart.findUnique({
+    let cart = await this._prismaService.cart.findUnique({
       where: { user_id: userId },
     });
 
     if (!cart) {
-      cart = await this.prismaService.cart.create({
+      cart = await this._prismaService.cart.create({
         data: { user_id: userId },
       });
     }
@@ -37,7 +34,7 @@ export class CartService {
   }
 
   async getCart(userId: number) {
-    const cart = await this.prismaService.cart.findUnique({
+    const cart = await this._prismaService.cart.findUnique({
       where: { user_id: userId },
       include: { items: true },
     });
@@ -70,7 +67,7 @@ export class CartService {
     }
 
     const cart = await this.getOrCreateCart(userId);
-    const existingItem = await this.prismaService.cartItem.findFirst({
+    const existingItem = await this._prismaService.cartItem.findFirst({
       where: { cart_id: cart.id, product_id: dto.productId },
     });
 
@@ -78,7 +75,7 @@ export class CartService {
       throw new BadRequestException('Product already exist in cart');
     }
 
-    await this.prismaService.cartItem.create({
+    await this._prismaService.cartItem.create({
       data: { cart_id: cart.id, product_id: dto.productId, quantity: dto.quantity },
     });
 
@@ -92,7 +89,7 @@ export class CartService {
       throw new BadRequestException('Quantity exceeds available stock');
     }
 
-    const cart = await this.prismaService.cart.findUnique({
+    const cart = await this._prismaService.cart.findUnique({
       where: { user_id: userId },
     });
 
@@ -100,7 +97,7 @@ export class CartService {
       throw new NotFoundException('Cart not found');
     }
 
-    const cartItem = await this.prismaService.cartItem.findFirst({
+    const cartItem = await this._prismaService.cartItem.findFirst({
       where: { cart_id: cart.id, product_id: productId },
     });
 
@@ -108,7 +105,7 @@ export class CartService {
       throw new NotFoundException('Product not found in cart');
     }
 
-    await this.prismaService.cartItem.update({
+    await this._prismaService.cartItem.update({
       where: { id: cartItem.id },
       data: { quantity: dto.quantity },
     });
@@ -117,7 +114,7 @@ export class CartService {
   }
 
   async deleteCartItem(userId: number, productId: number) {
-    const cart = await this.prismaService.cart.findUnique({
+    const cart = await this._prismaService.cart.findUnique({
       where: { user_id: userId },
     });
 
@@ -125,7 +122,7 @@ export class CartService {
       throw new NotFoundException('Cart not found');
     }
 
-    const cartItem = await this.prismaService.cartItem.findFirst({
+    const cartItem = await this._prismaService.cartItem.findFirst({
       where: { cart_id: cart.id, product_id: productId },
     });
 
@@ -133,7 +130,7 @@ export class CartService {
       throw new NotFoundException('Product not found in cart');
     }
 
-    await this.prismaService.cartItem.delete({
+    await this._prismaService.cartItem.delete({
       where: { id: cartItem.id },
     });
 
@@ -141,7 +138,7 @@ export class CartService {
   }
 
   async clearCart(userId: number) {
-    const cart = await this.prismaService.cart.findUnique({
+    const cart = await this._prismaService.cart.findUnique({
       where: { user_id: userId },
     });
 
@@ -149,7 +146,7 @@ export class CartService {
       throw new NotFoundException('Cart not found');
     }
 
-    await this.prismaService.cartItem.deleteMany({
+    await this._prismaService.cartItem.deleteMany({
       where: { cart_id: cart.id },
     });
 

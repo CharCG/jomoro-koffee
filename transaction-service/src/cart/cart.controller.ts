@@ -21,14 +21,14 @@ import {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('CUSTOMER')
 export class CartController {
-  constructor(private readonly cartService: CartService) {}
+  constructor(private readonly _cartService: CartService) {}
 
   @ApiOperation({ summary: "Get user's cart" })
   @ApiOkResponse({ description: "The user's cart has been successfully retrieved" })
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @Get()
   getCart(@CurrentUser() user: CurrentUserDto) {
-    return this.cartService.getCart(user.id);
+    return this._cartService.getCart(user.id);
   }
 
   @ApiOperation({ summary: "Add an item to user's cart" })
@@ -37,7 +37,7 @@ export class CartController {
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @Post()
   addToCart(@CurrentUser() user: CurrentUserDto, @Body() dto: AddToCartDto) {
-    return this.cartService.addToCart(user.id, dto);
+    return this._cartService.addToCart(user.id, dto);
   }
 
   @ApiOperation({ summary: "Update the quantity of an item in user's cart" })
@@ -51,7 +51,7 @@ export class CartController {
     @Param('productId', ParseIntPipe) productId: number,
     @Body() dto: UpdateCartItemDto,
   ) {
-    return this.cartService.updateCartItem(user.id, productId, dto);
+    return this._cartService.updateCartItem(user.id, productId, dto);
   }
 
   @ApiOperation({ summary: "Delete an item from user's cart" })
@@ -60,7 +60,7 @@ export class CartController {
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @Post(':productId/delete')
   deleteCartItem(@CurrentUser() user: CurrentUserDto, @Param('productId', ParseIntPipe) productId: number) {
-    return this.cartService.deleteCartItem(user.id, productId);
+    return this._cartService.deleteCartItem(user.id, productId);
   }
 
   @ApiOperation({ summary: "Clear user's cart" })
@@ -69,6 +69,6 @@ export class CartController {
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
   @Post('clear')
   clearCart(@CurrentUser() user: CurrentUserDto) {
-    return this.cartService.clearCart(user.id);
+    return this._cartService.clearCart(user.id);
   }
 }

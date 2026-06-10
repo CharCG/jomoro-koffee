@@ -5,10 +5,10 @@ import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly _prismaService: PrismaService) {}
 
   async createProduct(dto: CreateProductDto) {
-    const existingCategory = await this.prismaService.category.findUnique({
+    const existingCategory = await this._prismaService.category.findUnique({
       where: { id: dto.categoryId },
     });
 
@@ -16,7 +16,7 @@ export class AdminService {
       throw new NotFoundException('Category not found');
     }
 
-    const newProduct = await this.prismaService.product.create({
+    const newProduct = await this._prismaService.product.create({
       data: {
         name: dto.name,
         description: dto.description,
@@ -31,7 +31,7 @@ export class AdminService {
   }
 
   async updateProduct(productId: number, dto: UpdateProductDto) {
-    const existingProduct = await this.prismaService.product.findUnique({
+    const existingProduct = await this._prismaService.product.findUnique({
       where: { id: productId },
     });
 
@@ -39,7 +39,7 @@ export class AdminService {
       throw new NotFoundException('Product not found');
     }
 
-    const updatedProduct = await this.prismaService.product.update({
+    const updatedProduct = await this._prismaService.product.update({
       where: { id: productId },
       data: {
         name: dto.name,
@@ -55,7 +55,7 @@ export class AdminService {
   }
 
   async reduceProductStock(productId: number, quantity: number) {
-    const existingProduct = await this.prismaService.product.findUnique({
+    const existingProduct = await this._prismaService.product.findUnique({
       where: { id: productId },
     });
 
@@ -67,7 +67,7 @@ export class AdminService {
       throw new BadRequestException('Insufficient stock');
     }
 
-    const updatedProduct = await this.prismaService.product.update({
+    const updatedProduct = await this._prismaService.product.update({
       where: { id: productId },
       data: { stock: existingProduct.stock - quantity },
     });
@@ -76,7 +76,7 @@ export class AdminService {
   }
 
   async deleteProduct(productId: number) {
-    const existingProduct = await this.prismaService.product.findUnique({
+    const existingProduct = await this._prismaService.product.findUnique({
       where: { id: productId },
     });
 
@@ -84,7 +84,7 @@ export class AdminService {
       throw new NotFoundException('Product not found');
     }
 
-    const deletedProduct = await this.prismaService.product.delete({
+    const deletedProduct = await this._prismaService.product.delete({
       where: { id: productId },
     });
 

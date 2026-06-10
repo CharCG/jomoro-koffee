@@ -4,13 +4,13 @@ import { ApiNotFoundResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagge
 
 @Controller('products')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(private readonly _productService: ProductService) {}
 
   @ApiOperation({ summary: 'Get all products' })
   @ApiOkResponse({ description: 'The products have been retrieved successfully' })
   @Get()
   getProducts() {
-    return this.productService.getProducts();
+    return this._productService.getProducts();
   }
 
   @ApiOperation({ summary: 'Get a product by ID' })
@@ -18,6 +18,6 @@ export class ProductController {
   @ApiNotFoundResponse({ description: 'The product ID not found' })
   @Get(':productId')
   getProductById(@Param('productId', ParseIntPipe) productId: number) {
-    return this.productService.getProductById(productId);
+    return this._productService.getProductById(productId);
   }
 }

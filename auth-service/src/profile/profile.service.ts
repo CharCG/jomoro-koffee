@@ -3,10 +3,10 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ProfileService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly _prismaService: PrismaService) {}
 
   async getProfile(userId: number) {
-    const existingUser = await this.prismaService.user.findUnique({
+    const existingUser = await this._prismaService.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
