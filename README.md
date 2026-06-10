@@ -17,9 +17,7 @@ Jomoro Koffee is a rapidly expanding coffee chain company specializing in high-q
 ## Documentation
 
 - [Getting Started](#getting-started)
-- [Tech Stack](#tech-stack)
 - [Endpoints](#endpoints)
-- [Architecture](#architecture)
 
 ## Getting Started
 
