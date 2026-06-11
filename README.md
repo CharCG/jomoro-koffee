@@ -38,7 +38,7 @@ npm install
 cp .env.example .env
 
 npx prisma generate
-npx prisma migrate dev
+npx prisma migrate dev --name init
 ```
 
 ### Environment Variables
